@@ -1,4 +1,5 @@
 
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -10,20 +11,17 @@ _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-double initiallat=0.0;
-double initiallong=0.0;
-double finallat=0.0;
-double finallong=0.0;
 
-double initialspeed=0.0;
 double timeToReach30=0.0;
 double timeToReach10=0.0;
-
-double distancePM=0.0;
+Stopwatch timer=new Stopwatch();
+Stopwatch timer2=new Stopwatch();
 double speedInMps=0.0;
 double speedInKph=0.0;
  final Geolocator  geolocator = Geolocator()..forceAndroidLocationManager = true;
  var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
+
+ 
 
 @override
 void initState() {
@@ -37,29 +35,24 @@ void initState() {
       setState(() {
        
         speedInKph = speedInMps * 3.6;
-        if(speedInKph?.round()==10)
+      
+        if(speedInKph.round()>= 10 && speedInKph.round()<30)
         {
-         
-           initiallat  =position.latitude;
-           initiallong=position.longitude;
+
+         timer.start();
 
         }
-        else if( speedInKph?.round()==30)
-        {
-           finallat  =position.latitude;
-           finallong=position.longitude;
-        distancePM =Geolocator().distanceBetween(initiallat, initiallong, finallat, finallong) as double;
-        initialspeed=10.0;
-        timeToReach30=(distancePM*0.001) /((initialspeed+speedInKph)/2);
-        timeToReach30=timeToReach30*3600;
-        ///return time
-         initialspeed=30.0;
-         speedInKph=10.0;
-         distancePM =Geolocator().distanceBetween(finallat, finallong,initiallat, initiallong) as double;
+         if(speedInKph.round()>=30 ){
+           timeToReach30= (timer.elapsedMilliseconds*1000) as double;
+           timer.stop();
+          timer2.start();
+          }
+        
+        else if(speedInKph.round()<=10 ){
+           timeToReach10= (timer.elapsedMilliseconds*1000) as double;
+           timer2.stop();
+          }
 
-        timeToReach10=(distancePM*0.001) /((initialspeed+speedInKph)/2);
-        timeToReach10=timeToReach30*3600;
-        }
       });
 
       print(speedInKph.round().toString());
@@ -92,7 +85,7 @@ return MaterialApp(
           children: <Widget>[
             Padding(padding: EdgeInsets.only(top: 90.0)),
       Text(
-         ' current Speed',
+  ' current Speed',
        style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
